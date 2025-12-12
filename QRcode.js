@@ -30,7 +30,7 @@ async function qrcode() {
       }
       await delay(1000)
     }
-    console.log("用户列表"+JSON.stringify(keyResults, null, 0));
+    console.log(JSON.stringify(keyResults, null, 0));
     loginResults.forEach((item, index) => {
       console.log(`User ${index} BM: ${item.BM} IMG: ${item.IMG}`);
     });
