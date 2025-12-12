@@ -17,11 +17,11 @@ async function qrcode() {
       let result = await send(`/login/qr/key?timestamp=${Date.now()}`, "GET", {})
       if (result.status === 1) {
         loginResults.push({
-          KEY: result.data.qrcode,
-          qrcodeImg: result.data.qrcode_img
+          BM: result.data.qrcode,
+          IMG: result.data.qrcode_img
         });
         keyResults.push({
-          KEY: result.data.qrcode
+          BM: result.data.qrcode
         });
       } else {
         console.log("响应内容")
@@ -31,7 +31,9 @@ async function qrcode() {
       await delay(1000)
     }
     console.log("用户列表"+JSON.stringify(keyResults, null, 0));
-    console.log("用户列表"+JSON.stringify(loginResults, null, 2));
+    loginResults.forEach((item, index) => {
+      console.log(`User ${index} BM: ${item.BM} IMG: ${item.IMG}`);
+    });
   } finally {
     close_api(api)
   }

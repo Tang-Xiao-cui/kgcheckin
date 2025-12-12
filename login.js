@@ -34,7 +34,7 @@ async function login() {
       }
       const loginResults = [];
       for (const [index, temp] of keyArr.entries()) {
-        const key = temp.key;
+        const key = temp.BM;
         console.log(`\n开始处理第 ${index + 1} 个用户 (key: ${key})`);
         const res = await send(`/login/qr/check?key=${key}`, "GET", {})
         switch (res?.data?.status) {
