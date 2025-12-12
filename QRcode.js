@@ -1,7 +1,11 @@
 import { close_api, delay, send, startService } from "./utils/utils.js";
-
+import fs from "fs";
+import path from "path";
 async function qrcode() {
-
+  let userSize = process.env.SIZE
+  if (!userSize) {
+    userSize = 3
+  }
   // 启动服务
   let api = startService()
   await delay(2000)
@@ -9,13 +13,16 @@ async function qrcode() {
   try {
     // 登录请求
     const loginResults = [];
-    for (let i = 0; i < 5; i++) {
+    const keyResults = [];
+    for (let i = 0; i < userSize; i++) {
       let result = await send(`/login/qr/key`, "GET", {})
       if (result.status === 1) {
-        console.log("请求成功！")
         loginResults.push({
           KEY: result.data.qrcode,
           qrcodeImg: result.data.qrcode_img
+        });
+        keyResults.push({
+          KEY: result.data.qrcode
         });
       } else {
         console.log("响应内容")
@@ -23,14 +30,16 @@ async function qrcode() {
         throw new Error("请求失败！请检查")
       }
     }
+    console.log("用户列表"+JSON.stringify(keyResults, null, 2));
     console.log("用户列表"+JSON.stringify(loginResults, null, 2));
     // 生成二维码HTML文件
     try {
       const htmlFilePath = generateQRCodeHTML(loginResults);
       console.log("用户列表已生成，点击下方链接查看二维码:");
       console.log(`file://${path.resolve(htmlFilePath)}`);
-    }finally {
-
+    }catch (e){
+      console.log("用户列表已生成生成失败！");
+      console.error(e)
     }
 
   } finally {
