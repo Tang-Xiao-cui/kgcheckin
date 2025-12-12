@@ -16,5 +16,4 @@ jobs:
       - run: npm run install
       - run: npm run main
         env:
-          TOKEN: ${{ secrets.TOKEN }}
-          USERID: ${{ secrets.USERID }}
+          USERS: ${{ secrets.USERS }}
