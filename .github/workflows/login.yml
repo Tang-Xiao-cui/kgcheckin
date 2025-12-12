@@ -18,4 +18,4 @@ jobs:
         env:
           PHONE: ${{ secrets.PHONE }}
           CODE: ${{ secrets.CODE }}
-          KEY: ${{ secrets.KEY }}
+          KEY: ${{ secrets.KEYS }}

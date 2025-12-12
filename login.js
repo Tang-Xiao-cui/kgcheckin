@@ -4,11 +4,11 @@ async function login() {
 
   const phone = process.env.PHONE
   const code = process.env.CODE
-  const key = process.env.KEY
+  const KEYS = process.env.KEYS
   let qrLogin = true
-
+  //[{ "key": "478961421"}, { "key": "567529612"}]
   // 没有二维码则不使用二维码登录
-  if (!key) {
+  if (!KEYS) {
     qrLogin = false
   }
   // 不使用二维码登录并且没有手机号或验证码
@@ -21,31 +21,49 @@ async function login() {
 
   try {
     if (qrLogin) {
-      const res = await send(`/login/qr/check?key=${key}`, "GET", {})
-      switch (res?.data?.status) {
-        case 0:
-          console.log("二维码已过期")
-          break;
 
-        case 1:
-          console.log("未扫描二维码")
-          break;
-
-        case 2:
-          console.log("二维码未确认，点击登录后重试")
-          break;
-
-        case 4:
-          console.log("登录成功！")
-          console.log("第一行是token,第二行是userid")
-          console.log(res.data.token)
-          console.log(res.data.userid)
-          break;
-        default:
-          console.log("响应信息")
-          console.dir(res, { depth: null })
-          throw new Error("登录失败")
+      let keyArr;
+      try {
+        keyArr = JSON.parse(KEYS);
+      } catch (e) {
+        throw new Error("KEYS 配置解析失败，请确保是有效的 JSON 格式");
       }
+
+      if (!Array.isArray(keyArr) || keyArr.length === 0) {
+        throw new Error("KEYS 配置必须是一个非空数组");
+      }
+      const loginResults = [];
+      for (const [index, temp] of keyArr.entries()) {
+        const key = temp.key;
+        console.log(`\n开始处理第 ${index + 1} 个用户 (key: ${key})`);
+        const res = await send(`/login/qr/check?key=${key}`, "GET", {})
+        switch (res?.data?.status) {
+          case 0:
+            console.log("二维码已过期")
+            break;
+
+          case 1:
+            console.log("未扫描二维码")
+            break;
+
+          case 2:
+            console.log("二维码未确认，点击登录后重试")
+            break;
+
+          case 4:
+            console.log("登录成功！")
+            loginResults.push({
+              token: res.data.token,
+              userid: res.data.userid
+            });
+            break;
+          default:
+            console.log("响应信息")
+            console.dir(res, { depth: null })
+            throw new Error("登录失败")
+        }
+      }
+      console.log("用户列表"+JSON.stringify(loginResults, null, 2));
 
     } else {
       // 手机号登录请求
