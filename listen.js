@@ -11,6 +11,8 @@ async function main() {
 
     const api = startService();
     await delay(2000);
+    let error = false;
+    let error_msg = "";
     try {
         for (const [index, user] of users.entries()) {
             const t = user.token;
@@ -40,12 +42,23 @@ async function main() {
             let cr = await send("/youth/listen/song", "GET", headers);
 
             if (cr.status === 1) {
-                console.log("听歌成功");
+                console.log(`第 ${index + 1} 个用户 (UID: ${uid})听歌成功`);
             } else {
+                error = true;
+                if ("130012" == cr.error_code) {
+                    error_msg = `第 ${index + 1} 个用户 (UID: ${uid})今日已领取`;
+                }else if ("20018" == cr.error_code || "51002" == cr.error_code){
+                    error_msg = `第 ${index + 1} 个用户 (UID: ${uid})未登录`;
+                }else if ("30002" == cr.error_code){
+                    error_msg = `第 ${index + 1} 个用户 (UID: ${uid})次数已用光`;
+                }else {
+                    error_msg = `第 ${index + 1} 个用户 (UID: ${uid})未知错误`;
+                }
+                console.error(error_msg);
                 console.log("响应内容");
                 console.dir(cr, {depth: null});
-                console.error("听歌签到失败：" + cr.error_code);
-                throw new Error("听歌签到失败")
+
+
             }
 
             let vip_details = await send("/user/vip/detail", "GET", headers);
@@ -53,11 +66,15 @@ async function main() {
                 console.log(`今天是：${date}`);
                 console.log(`VIP到期时间：${vip_details.data.busi_vip[0].vip_end_time}`);
             } else {
+                error = true;
+                error_msg = `第 ${index + 1} 个用户 (UID: ${uid})获取 VIP 详情失败`;
+                console.error(error_msg);
                 console.log("响应内容");
                 console.dir(vip_details, {depth: null});
-                console.error("获取 VIP 详情失败");
-                throw new Error("获取 VIP 详情失败")
             }
+        }
+        if (error) {
+            throw new Error(error_msg)
         }
     } finally {
         close_api(api);
