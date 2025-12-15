@@ -9,7 +9,7 @@ async function main() {
         if (!fs.existsSync('./login_res.json')) {
             throw new Error("缺少 USERS 配置！请检查");
         }
-        const fileContent = fs.readFileSync('./qr_res.json', 'utf8');
+        const fileContent = fs.readFileSync('./login_res.json', 'utf8');
         users = JSON.parse(fileContent);
     }
 

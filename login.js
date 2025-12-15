@@ -6,7 +6,7 @@ async function login() {
   let qrLogin = true
   //[{ "key": "478961421"}, { "key": "567529612"}]
   // 没有二维码则不使用二维码登录
-  if (!fs.existsSync('./qr_res.json')) {
+  if (!fs.existsSync('./qr-res.json')) {
     qrLogin = false
   }
   // 不使用二维码登录并且没有手机号或验证码
@@ -22,7 +22,7 @@ async function login() {
 
       let keyArr;
       try {
-        const fileContent = fs.readFileSync('./qr_res.json', 'utf8');
+        const fileContent = fs.readFileSync('./qr-res.json', 'utf8');
         keyArr = JSON.parse(fileContent);
       } catch (e) {
         throw new Error("KEYS 配置解析失败，请确保是有效的 JSON 格式");

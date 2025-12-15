@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: 18
       # 下载QRCode工作流生成的artifacts
-      - name: Download QR Code Results
+      - name: qrcode-results
         uses: actions/download-artifact@v4
         with:
           name: qrcode-results
@@ -24,8 +24,9 @@ jobs:
           PHONE: ${{ secrets.PHONE }}
           CODE: ${{ secrets.CODE }}
       # 上传登录结果作为artifacts
-      - name: Upload Login Results
+      - name: login-results
         uses: actions/upload-artifact@v4
         with:
+          retention-days: 70
           name: login-results
           path: ./login_res.json
