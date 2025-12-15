@@ -10,7 +10,7 @@ async function login() {
   // 启动服务
   const api = startService()
   await delay(2000)
-  let phoneArr = JSON.parse(KEYS);
+  let phoneArr = JSON.parse(phones);
   console.log("开始发送验证码")
   try {
     for (const [index, temp] of phoneArr.entries()) {
