@@ -1,0 +1,43 @@
+
+sent: 发送验证码
+
+PHONES
+
+[
+  {
+    "phone": "13312320020",
+    "code": "x"
+  },
+  {
+    "phone": "xx",
+    "code": "x"
+  }
+]
+
+login：二维码登录(运行Qrcode 从Artifacts——>qrcode-results获取)
+
+KEYS
+
+[
+  {
+    "qrcode": "c241c811c057e9291410caec5aa423221001"
+  },
+  {
+    "qrcode": "c5d7e1d58ce8afec2811fad3ff876c821001"
+  }
+]
+
+listen、run
+
+USERS
+
+[
+  {
+    "userid": "13312320020",
+    "token": "x"
+  },
+  {
+    "userid": "13312320020",
+    "token": "x"
+  }
+]
