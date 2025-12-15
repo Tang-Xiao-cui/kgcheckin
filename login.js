@@ -1,37 +1,24 @@
 import { close_api, delay, send, startService } from "./utils/utils.js";
 import fs from "fs";
 async function login() {
-  const phone = process.env.PHONE
-  const code = process.env.CODE
-  let qrLogin = true
-  //[{ "key": "478961421"}, { "key": "567529612"}]
-  // 没有二维码则不使用二维码登录
-  if (!fs.existsSync('./qr-res.json')) {
-    qrLogin = false
-  }
-  // 不使用二维码登录并且没有手机号或验证码
-  if (!qrLogin && (!phone || !code)) {
+  const CODES = process.env.PHONES
+  const KEYS = process.env.KEYS
+
+  if (!KEYS && !CODES) {
     throw new Error("参数错误！请检查")
   }
+
   // 启动服务
   const api = startService()
   await delay(2000)
-
+  const loginResults = [];
   try {
-    if (qrLogin) {
-
-      let keyArr;
-      try {
-        const fileContent = fs.readFileSync('./qr-res.json', 'utf8');
-        keyArr = JSON.parse(fileContent);
-      } catch (e) {
-        throw new Error("KEYS 配置解析失败，请确保是有效的 JSON 格式");
-      }
-
+    if (KEYS) {
+      let keyArr = JSON.parse(KEYS);
       if (!Array.isArray(keyArr) || keyArr.length === 0) {
         throw new Error("KEYS 配置必须是一个非空数组");
       }
-      const loginResults = [];
+
       for (const [index, temp] of keyArr.entries()) {
         const key = temp.qrcode;
         console.log(`\n开始处理第 ${index + 1} 个用户 (key: ${key})`);
@@ -62,25 +49,30 @@ async function login() {
             // throw new Error("登录失败")
         }
       }
-      fs.writeFileSync('./login_res.json', JSON.stringify(loginResults, null, 0));
-      console.log("用户列表"+JSON.stringify(loginResults, null, 2));
-
     } else {
-      // 手机号登录请求
-      const result = await send(`/login/cellphone?mobile=${phone}&code=${code}`, "GET", {})
-      if (result.status === 1) {
-        console.log("登录成功！")
-        console.log("第一行是token,第二行是userid")
-        console.log(result.data.token)
-        console.log(result.data.userid)
-      } else if (result.error_code === 34175) {
-        throw new Error("暂不支持多账号绑定手机登录")
-      } else {
-        console.log("响应内容")
-        console.dir(result, { depth: null })
-        throw new Error("登录失败！请检查")
+      let codeArr = JSON.parse(CODES);
+      for (const [index, temp] of codeArr.entries()) {
+        const phone = temp.phone;
+        const code = temp.code;
+        // 手机号登录请求
+        const result = await send(`/login/cellphone?mobile=${phone}&code=${code}`, "GET", {})
+        if (result.status === 1) {
+          console.log(`第 ${index + 1} 个用户登录成功！`)
+          loginResults.push({
+            token: result.data.token,
+            userid: result.data.userid
+          });
+        } else if (result.error_code === 34175) {
+          console.log(`第 ${index + 1} 个暂不支持多账号绑定手机登录`)
+        } else {
+          console.log(`第 ${index + 1} 个暂不支持多账号绑定手机登录`)
+          console.log("响应内容")
+          console.dir(result, {depth: null})
+        }
       }
     }
+    fs.writeFileSync('./login_res.json', JSON.stringify(loginResults, null, 0));
+    console.log("用户列表"+JSON.stringify(loginResults, null, 2));
   } finally {
     close_api(api)
   }

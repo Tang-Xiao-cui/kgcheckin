@@ -6,16 +6,9 @@ async function main() {
     if (usersConfig) {
         users = JSON.parse(usersConfig);
     }else {
-        if (!fs.existsSync('./login_res.json')) {
-            throw new Error("缺少 USERS 配置！请检查");
-        }
-        const fileContent = fs.readFileSync('./qr_res.json', 'utf8');
-        users = JSON.parse(fileContent);
+        throw new Error("缺少 USERS 配置！请检查");
     }
 
-    if (!Array.isArray(users) || users.length === 0) {
-        throw new Error("USERS 配置必须是一个非空数组");
-    }
     const api = startService();
     await delay(2000);
     try {

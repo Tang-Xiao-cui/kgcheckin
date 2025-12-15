@@ -16,4 +16,4 @@ jobs:
       - run: npm run install
       - run: npm run sent
         env:
-          PHONE: ${{ secrets.PHONE }}
+          PHONES: ${{ secrets.PHONES }}
