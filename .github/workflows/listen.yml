@@ -15,7 +15,7 @@ jobs:
           node-version: 18
       # 下载login工作流生成的artifacts
       - name: Download QR Code Results
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: login-results
       - run: npm run install
