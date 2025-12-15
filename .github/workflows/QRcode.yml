@@ -17,3 +17,9 @@ jobs:
       - run: npm run qrcode
         env:
           SIZE: ${{ secrets.SIZE }}
+      # 上传结果文件作为artifact
+      - name: Upload QR Code Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: qrcode-results
+          path: ./qr_res.json

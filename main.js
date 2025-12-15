@@ -1,14 +1,13 @@
 import {close_api, delay, send, startService} from "./utils/utils.js";
 
 async function main() {
-    const usersConfig = process.env.USERS;
-    if (!usersConfig) {
+    if (!fs.existsSync('./login_res.json')) {
         throw new Error("缺少 USERS 配置！请检查");
     }
-
     let users;
     try {
-        users = JSON.parse(usersConfig);
+        const fileContent = fs.readFileSync('./qr_res.json', 'utf8');
+        users = JSON.parse(fileContent);
     } catch (e) {
         throw new Error("USERS 配置解析失败，请确保是有效的 JSON 格式");
     }
@@ -47,7 +46,7 @@ async function main() {
                 throw new Error("token刷新失败")
             }
             // 开始签到
-            for (let i = 1; i <= 8; i++) {
+            for (let i = 1; i <= 3; i++) {
                 console.log(`第 ${index + 1} 个用户` + `开始第${i}次签到`)
                 // 签到获取vip
                 const cr = await send("/youth/vip", "GET", headers)
@@ -60,8 +59,8 @@ async function main() {
                     console.dir(cr, {depth: null})
                     throw new Error("签到失败：" + cr.error_msg)
                 }
-                if (i != 8) {
-                    await delay(5 * 60 * 1000)
+                if (i != 3) {
+                    await delay(4 * 60 * 1000)
                 }
             }
 

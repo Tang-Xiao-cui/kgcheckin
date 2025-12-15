@@ -1,5 +1,5 @@
 import { close_api, delay, send, startService } from "./utils/utils.js";
-
+import fs from "fs";
 async function qrcode() {
   let userSize = process.env.SIZE
   if (!userSize) {
@@ -15,12 +15,9 @@ async function qrcode() {
     for (let i = 0; i < userSize; i++) {
       let result = await send(`/login/qr/key?timestamp=${Date.now()}`, "GET", {})
       if (result.status === 1) {
-        console.log("请求成功！")
-        console.log(result.data.qrcode)
-        console.log(result.data.qrcode_img)
-        console.log("=========================================")
         keyResults.push({
-          BM: "混淆"+result.data.qrcode+"混淆"
+          qrcode: result.data.qrcode,
+          img: result.data.qrcode_img
         });
       } else {
         console.log("响应内容")
@@ -29,6 +26,8 @@ async function qrcode() {
       }
       await delay(1000)
     }
+    // 将结果写入文件以便后续工作流使用
+    fs.writeFileSync('./qr_res.json', JSON.stringify(keyResults, null, 0));
     console.log(JSON.stringify(keyResults, null, 0));
   } finally {
     close_api(api)

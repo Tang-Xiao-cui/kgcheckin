@@ -13,7 +13,10 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+      # 下载login工作流生成的artifacts
+      - name: Download QR Code Results
+        uses: actions/download-artifact@v3
+        with:
+          name: login-results
       - run: npm run install
       - run: npm run listen
-        env:
-          USERS: ${{ secrets.USERS }}

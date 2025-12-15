@@ -1,14 +1,12 @@
 import { close_api, delay, send, startService } from "./utils/utils.js";
-
+import fs from "fs";
 async function login() {
-
   const phone = process.env.PHONE
   const code = process.env.CODE
-  const KEYS = process.env.KEYS
   let qrLogin = true
   //[{ "key": "478961421"}, { "key": "567529612"}]
   // 没有二维码则不使用二维码登录
-  if (!KEYS) {
+  if (!fs.existsSync('./qr_res.json')) {
     qrLogin = false
   }
   // 不使用二维码登录并且没有手机号或验证码
@@ -24,7 +22,8 @@ async function login() {
 
       let keyArr;
       try {
-        keyArr = JSON.parse(KEYS);
+        const fileContent = fs.readFileSync('./qr_res.json', 'utf8');
+        keyArr = JSON.parse(fileContent);
       } catch (e) {
         throw new Error("KEYS 配置解析失败，请确保是有效的 JSON 格式");
       }
@@ -34,7 +33,7 @@ async function login() {
       }
       const loginResults = [];
       for (const [index, temp] of keyArr.entries()) {
-        const key = temp.BM;
+        const key = temp.qrcode;
         console.log(`\n开始处理第 ${index + 1} 个用户 (key: ${key})`);
         const res = await send(`/login/qr/check?key=${key}`, "GET", {})
         switch (res?.data?.status) {
@@ -63,6 +62,7 @@ async function login() {
             throw new Error("登录失败")
         }
       }
+      fs.writeFileSync('./login_res.json', JSON.stringify(loginResults, null, 0));
       console.log("用户列表"+JSON.stringify(loginResults, null, 2));
 
     } else {
