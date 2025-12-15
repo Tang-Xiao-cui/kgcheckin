@@ -44,14 +44,15 @@ async function main() {
             if (cr.status === 1) {
                 console.log(`第 ${index + 1} 个用户 (UID: ${uid})听歌成功`);
             } else {
-                error = true;
                 if ("130012" == cr.error_code) {
                     error_msg = `第 ${index + 1} 个用户 (UID: ${uid})今日已领取`;
                 }else if ("20018" == cr.error_code || "51002" == cr.error_code){
+                    error = true;
                     error_msg = `第 ${index + 1} 个用户 (UID: ${uid})未登录`;
                 }else if ("30002" == cr.error_code){
                     error_msg = `第 ${index + 1} 个用户 (UID: ${uid})次数已用光`;
                 }else {
+                    error = true;
                     error_msg = `第 ${index + 1} 个用户 (UID: ${uid})未知错误`;
                 }
                 console.error(error_msg);

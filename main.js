@@ -50,8 +50,13 @@ async function main() {
                 if (cr.status === 1) {
                     console.log(`第 ${index + 1} 个用户` + "签到成功")
                 } else {
-                    error =  true;
-                    error_msg = `第 ${index + 1} 个用户` + "签到失败：" + cr.error_msg
+                    if ("30002" == cr.error_code) {
+                        error_msg = `第 ${index + 1} 个用户` + cr.error_msg
+                    }else {
+                        error =  true;
+                        error_msg = `第 ${index + 1} 个用户签到失败` + cr.error_msg
+                    }
+
                     console.error(error_msg)
                     console.error(`第 ${index + 1} 个用户` + "响应内容")
                     console.dir(cr, {depth: null})
