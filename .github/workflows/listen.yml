@@ -20,3 +20,5 @@ jobs:
           name: login-results
       - run: npm run install
       - run: npm run listen
+        env:
+          USERS: ${{ secrets.USERS }}

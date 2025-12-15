@@ -50,7 +50,7 @@ async function login() {
             break;
 
           case 4:
-            console.log("登录成功！")
+            console.log(`"第 ${index + 1} 个用户登录成功！`)
             loginResults.push({
               token: res.data.token,
               userid: res.data.userid
@@ -59,7 +59,7 @@ async function login() {
           default:
             console.log("响应信息")
             console.dir(res, { depth: null })
-            throw new Error("登录失败")
+            // throw new Error("登录失败")
         }
       }
       fs.writeFileSync('./login_res.json', JSON.stringify(loginResults, null, 0));

@@ -1,15 +1,16 @@
 import {close_api, delay, send, startService} from "./utils/utils.js";
 
 async function main() {
-    if (!fs.existsSync('./login_res.json')) {
-        throw new Error("缺少 USERS 配置！请检查");
-    }
     let users;
-    try {
+    const usersConfig = process.env.USERS;
+    if (usersConfig) {
+        users = JSON.parse(usersConfig);
+    }else {
+        if (!fs.existsSync('./login_res.json')) {
+            throw new Error("缺少 USERS 配置！请检查");
+        }
         const fileContent = fs.readFileSync('./qr_res.json', 'utf8');
         users = JSON.parse(fileContent);
-    } catch (e) {
-        throw new Error("USERS 配置解析失败，请确保是有效的 JSON 格式");
     }
 
     if (!Array.isArray(users) || users.length === 0) {

@@ -27,7 +27,7 @@ async function qrcode() {
       await delay(1000)
     }
     // 将结果写入文件以便后续工作流使用
-    fs.writeFileSync('./qr_res.json', JSON.stringify(keyResults, null, 0));
+    fs.writeFileSync('./qr_res.json', JSON.stringify(keyResults, null, 2));
     console.log(JSON.stringify(keyResults, null, 0));
   } finally {
     close_api(api)
