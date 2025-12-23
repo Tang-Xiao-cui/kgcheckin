@@ -21,7 +21,9 @@ async function main() {
             if (!t || !uid) {
                 throw new Error("参数错误！请检查")
             }
-
+            if (index > 0) {
+                await delay(4 * 60 * 1000)
+            }
             console.log(`\n开始处理第 ${index + 1} 个用户 (UID: ${uid})`);
 
             const today = new Date();
@@ -73,7 +75,6 @@ async function main() {
                 console.log("响应内容");
                 console.dir(vip_details, {depth: null});
             }
-            await delay(4 * 60 * 1000)
         }
         if (error) {
             throw new Error(error_msg)
