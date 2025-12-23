@@ -1,4 +1,4 @@
-import { spawn } from 'child_process'
+import { spawn, exec } from 'child_process'
 
 function delay(ms) {
   return new Promise(resolve => {
@@ -8,9 +8,6 @@ function delay(ms) {
 
 // 运行api服务
 async function startService() {
-  // 杀死占用端口的进程
-  await killPort(3000);
-
   const api = spawn("npm", ["run", "apiService"]);
 
   api.stdout.on('data', data => {
@@ -37,19 +34,21 @@ function close_api(api) {
   }
   return delay(3000);
 }
+// 杀死占用指定端口的进程
 async function killPort(port) {
-  const { exec } = require('child_process');
-  return new Promise((resolve) => {
-    exec(`lsof -ti:${port} | xargs -r kill -9`, (error) => {
+  return new Promise((resolve, reject) => {
+    exec(`lsof -ti:${port} | xargs -r kill -9`, (error, stdout, stderr) => {
       if (error) {
         console.log(`清理端口 ${port} 时出错:`, error.message);
       } else {
         console.log(`已清理端口 ${port} 的占用`);
       }
+      // 给系统时间释放端口
       setTimeout(resolve, 1000);
     });
   });
 }
+
 // 发送请求
 async function send(path, method, headers) {
   const result = await fetch("http://localhost:3000" + path, {
@@ -60,4 +59,4 @@ async function send(path, method, headers) {
   return result
 }
 
-export { delay, startService, close_api, send }
+export { delay, startService, close_api, send, killPort }

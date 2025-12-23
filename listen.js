@@ -1,4 +1,4 @@
-import {close_api, delay, send, startService} from "./utils/utils.js";
+import {close_api, delay, send, startService, killPort} from "./utils/utils.js";
 import fs from "fs";
 
 async function main() {
@@ -16,6 +16,8 @@ async function main() {
 
     for (const [index, user] of users.entries()) {
         if (index > 0) {
+            // 杀死占用端口的进程
+            await killPort(3000);
             await delay(3000);
         }
         const t = user.token;
