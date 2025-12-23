@@ -30,9 +30,10 @@ async function startService() {
 // 关闭api服务
 function close_api(api) {
   if (!api.killed) {
-    api.kill('SIGTERM');
+    api.kill();
   }
-  return delay(3000);
+  // 等待端口释放
+  return delay(2000);
 }
 // 杀死占用指定端口的进程
 async function killPort(port) {
