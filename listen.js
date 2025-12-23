@@ -15,6 +15,9 @@ async function main() {
     let error_msg = "";
 
     for (const [index, user] of users.entries()) {
+        if (index > 0) {
+            await delay(7000);
+        }
         const t = user.token;
         const uid = user.userid;
 
@@ -75,7 +78,6 @@ async function main() {
             }
         } finally {
             close_api(api);
-            await delay(5000);
         }
     }
     if (error) {

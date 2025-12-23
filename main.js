@@ -12,6 +12,9 @@ async function main() {
     let error = false;
     let error_msg = "";
     for (const [index, user] of users.entries()) {
+        if (index > 0) {
+            await delay(7000);
+        }
         api = startService()
         await delay(2000);
         try {

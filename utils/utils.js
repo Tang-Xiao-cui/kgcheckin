@@ -28,7 +28,11 @@ function startService() {
 
 // 关闭api服务
 function close_api(api) {
-  api.kill()
+  if (!api.killed) {
+    api.kill();
+  }
+  // 等待端口释放
+  return delay(2000);
 }
 
 // 发送请求
