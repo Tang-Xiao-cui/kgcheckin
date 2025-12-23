@@ -75,6 +75,7 @@ async function main() {
             }
         } finally {
             close_api(api);
+            await delay(5000);
         }
     }
     if (error) {

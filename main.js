@@ -80,6 +80,7 @@ async function main() {
             }
         } finally {
             close_api(api);
+            await delay(4000);
         }
     }
     if (error) {
