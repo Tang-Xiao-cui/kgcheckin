@@ -16,7 +16,7 @@ async function main() {
 
     for (const [index, user] of users.entries()) {
         if (index > 0) {
-            await delay(7000);
+            await delay(3000);
         }
         const t = user.token;
         const uid = user.userid;

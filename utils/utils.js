@@ -7,34 +7,49 @@ function delay(ms) {
 }
 
 // 运行api服务
-function startService() {
+async function startService() {
+  // 杀死占用端口的进程
+  await killPort(3000);
 
-  let api = spawn("npm", ["run", "apiService"])
+  const api = spawn("npm", ["run", "apiService"]);
 
   api.stdout.on('data', data => {
-    // console.log(`${data}`)
-  })
+    console.log(`${data}`);
+  });
 
   api.on('close', code => {
-    console.log(`子进程退出`)
-  })
-  api.stderr.on('data', data => {
-    console.log("服务启动失败")
-    throw new Error(`${data}`)
-  })
-  return api
+    console.log(`子进程退出，退出码: ${code}`);
+  });
 
+  api.stderr.on('data', data => {
+    console.log("服务启动失败:", data.toString());
+  });
+
+  // 等待服务启动
+  await delay(2000);
+  return api;
 }
 
 // 关闭api服务
 function close_api(api) {
   if (!api.killed) {
-    api.kill();
+    api.kill('SIGTERM');
   }
-  // 等待端口释放
-  return delay(2000);
+  return delay(3000);
 }
-
+async function killPort(port) {
+  const { exec } = require('child_process');
+  return new Promise((resolve) => {
+    exec(`lsof -ti:${port} | xargs -r kill -9`, (error) => {
+      if (error) {
+        console.log(`清理端口 ${port} 时出错:`, error.message);
+      } else {
+        console.log(`已清理端口 ${port} 的占用`);
+      }
+      setTimeout(resolve, 1000);
+    });
+  });
+}
 // 发送请求
 async function send(path, method, headers) {
   const result = await fetch("http://localhost:3000" + path, {
