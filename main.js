@@ -13,8 +13,6 @@ async function main() {
     let error_msg = "";
     for (const [index, user] of users.entries()) {
         if (index > 0) {
-            // 杀死占用端口的进程
-            await killPort(3000);
             await delay(3000);
         }
         api = startService()
@@ -84,7 +82,8 @@ async function main() {
                 console.dir(vip_details, {depth: null})
             }
         } finally {
-            close_api(api);
+            // 杀死占用端口的进程
+            await killPort(3000);
         }
     }
     if (error) {
