@@ -1,27 +1,29 @@
 import {close_api, delay, send, startService} from "./utils/utils.js";
 import fs from "fs";
+
 async function main() {
     let users;
     const usersConfig = process.env.USERS;
     if (usersConfig) {
         users = JSON.parse(usersConfig);
-    }else {
+    } else {
         throw new Error("缺少 USERS 配置！请检查");
     }
 
-    const api = startService();
-    await delay(2000);
+    let api = null;
     let error = false;
     let error_msg = "";
-    try {
-        for (const [index, user] of users.entries()) {
-            const t = user.token;
-            const uid = user.userid;
 
-            if (!t || !uid) {
-                throw new Error("参数错误！请检查")
-            }
+    for (const [index, user] of users.entries()) {
+        const t = user.token;
+        const uid = user.userid;
 
+        if (!t || !uid) {
+            throw new Error("参数错误！请检查")
+        }
+        api = startService();
+        await delay(2000);
+        try {
             console.log(`\n开始处理第 ${index + 1} 个用户 (UID: ${uid})`);
 
             const today = new Date();
@@ -46,20 +48,18 @@ async function main() {
             } else {
                 if ("130012" == cr.error_code) {
                     error_msg = `第 ${index + 1} 个用户 (UID: ${uid})今日已领取`;
-                }else if ("20018" == cr.error_code || "51002" == cr.error_code){
+                } else if ("20018" == cr.error_code || "51002" == cr.error_code) {
                     error = true;
                     error_msg = `第 ${index + 1} 个用户 (UID: ${uid})未登录`;
-                }else if ("30002" == cr.error_code){
+                } else if ("30002" == cr.error_code) {
                     error_msg = `第 ${index + 1} 个用户 (UID: ${uid})次数已用光`;
-                }else {
+                } else {
                     error = true;
                     error_msg = `第 ${index + 1} 个用户 (UID: ${uid})未知错误`;
                 }
                 console.error(error_msg);
                 console.log("响应内容");
                 console.dir(cr, {depth: null});
-
-
             }
 
             let vip_details = await send("/user/vip/detail", "GET", headers);
@@ -73,12 +73,12 @@ async function main() {
                 console.log("响应内容");
                 console.dir(vip_details, {depth: null});
             }
+        } finally {
+            close_api(api);
         }
-        if (error) {
-            throw new Error(error_msg)
-        }
-    } finally {
-        close_api(api);
+    }
+    if (error) {
+        throw new Error(error_msg)
     }
 
     if (api.killed) {

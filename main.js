@@ -5,15 +5,16 @@ async function main() {
     const usersConfig = process.env.USERS;
     if (usersConfig) {
         users = JSON.parse(usersConfig);
-    }else {
+    } else {
         throw new Error("缺少 USERS 配置！请检查");
     }
-    const api = startService();
-    await delay(2000);
+    let api = null;
     let error = false;
     let error_msg = "";
-    try {
-        for (const [index, user] of users.entries()) {
+    for (const [index, user] of users.entries()) {
+        api = startService()
+        await delay(2000);
+        try {
             const t = user.token;
             const uid = user.userid;
             if (!t || !uid) {
@@ -35,7 +36,7 @@ async function main() {
             if (res.status == 1) {
                 console.log(`第 ${index + 1} 个用户` + "token刷新成功")
             } else {
-                error =  true;
+                error = true;
                 error_msg = "第 " + (index + 1) + " 个用户" + "token刷新失败"
                 console.error(error_msg)
                 console.error(`第 ${index + 1} 个用户` + "响应内容")
@@ -52,8 +53,8 @@ async function main() {
                 } else {
                     if ("30002" == cr.error_code) {
                         error_msg = `第 ${index + 1} 个用户` + cr.error_msg
-                    }else {
-                        error =  true;
+                    } else {
+                        error = true;
                         error_msg = `第 ${index + 1} 个用户签到失败` + cr.error_msg
                     }
 
@@ -71,20 +72,19 @@ async function main() {
                 console.log(`今天是：${date}`)
                 console.log(`第 ${index + 1} 个用户` + `VIP到期时间：${vip_details.data.busi_vip[0].vip_end_time}`)
             } else {
-                error =  true;
+                error = true;
                 error_msg = `第 ${index + 1} 个用户` + "获取失败"
                 console.error(error_msg)
                 console.error(`第 ${index + 1} 个用户` + "响应内容")
                 console.dir(vip_details, {depth: null})
             }
+        } finally {
+            close_api(api);
         }
-        if (error) {
-            throw new Error(error_msg)
-        }
-    } finally {
-        close_api(api);
     }
-
+    if (error) {
+        throw new Error(error_msg)
+    }
     if (api.killed) {
         // 强制关闭进程
         process.exit(0);
