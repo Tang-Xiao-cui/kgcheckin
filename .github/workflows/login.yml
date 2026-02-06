@@ -16,7 +16,6 @@ jobs:
       - run: npm run install
       - run: npm run login
         env:
-          PHONES: ${{ secrets.PHONES }}
           KEYS: ${{ secrets.KEYS }}
       # 上传登录结果作为artifacts
       - name: login-results
